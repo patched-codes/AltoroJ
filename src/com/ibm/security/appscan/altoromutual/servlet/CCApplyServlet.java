@@ -18,7 +18,11 @@ IBM AltoroJ
 package com.ibm.security.appscan.altoromutual.servlet;
 
 import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.Arrays;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -44,11 +48,22 @@ public class CCApplyServlet extends HttpServlet {
 		//redirect to success page
 		
 		try {
-			String passwd = request.getParameter("passwd");
+			char[] passwdChars = request.getParameter("passwd").toCharArray();
 			User user = (User)(request.getSession().getAttribute(ServletUtil.SESSION_ATTR_USER));
 			
+			// Hash the password
+			byte[] salt = new byte[16];
+			SecureRandom random = new SecureRandom();
+			random.nextBytes(salt);
+			PBEKeySpec spec = new PBEKeySpec(passwdChars, salt, 65536, 128);
+			SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+			byte[] hash = skf.generateSecret(spec).getEncoded();
+			
+			// Erase the password
+			Arrays.fill(passwdChars, '0');
+			
 			//correct password entered
-			if (DBUtil.isValidUser(user.getUsername(), passwd.trim())) {
+			if (DBUtil.isValidUser(user.getUsername(), hash)) {
 				RequestDispatcher dispatcher = request.getRequestDispatcher("/bank/applysuccess.jsp");
 				dispatcher.forward(request, response);	
 			}
@@ -61,8 +76,5 @@ public class CCApplyServlet extends HttpServlet {
 		} catch (Exception e) {
 			response.sendError(500);
 		}
-				
-
 	}
-
 }
