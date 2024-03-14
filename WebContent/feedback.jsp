@@ -27,6 +27,7 @@ IBM AltoroJ
 	<jsp:include page="toc.jspf"/>
     <td valign="top" colspan="3" class="bb">
 		<%@page import="com.ibm.security.appscan.altoromutual.model.User"%>
+		<%@page import="org.apache.commons.text.StringEscapeUtils"%>
 
 		<%User user = null;
 		try {
@@ -56,7 +57,7 @@ IBM AltoroJ
 		  </tr>
 		  <tr>
 		    <td align=right>Your Name:</td>
-		    <td valign=top><input name="name" size=25 type=text value = "<%= ((user != null && user.getFirstName() != null)?user.getFirstName()+" ":"") + ((user != null && user.getLastName() != null)?user.getLastName():"") %>"></td>
+		    <td valign=top><input name="name" size=25 type=text value = "<%= StringEscapeUtils.escapeHtml4(((user != null && user.getFirstName() != null)?user.getFirstName()+" ":"") + ((user != null && user.getLastName() != null)?user.getLastName():"")) %>"></td>
 		  </tr>
 		  <tr>
 		    <td align=right>Your Email Address:</td>
