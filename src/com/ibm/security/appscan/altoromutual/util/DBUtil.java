@@ -296,67 +296,103 @@ public class DBUtil {
 	 * @return
 	 */
 	public static String transferFunds(String username, long creditActId, long debitActId, double amount) {
+					
+			try {
 				
-		try {
+				User user = getUserInfo(username);
+				
+				Connection connection = getConnection();
+				connection.setAutoCommit(false); // Start transaction block
+	
+				PreparedStatement pstmt = null;
+	
+				Account debitAccount = Account.getAccount(debitActId);
+				Account creditAccount = Account.getAccount(creditActId);
+	
+				if (debitAccount == null){
+					return "Originating account is invalid";
+				} 
+				
+				if (creditAccount == null)
+					return "Destination account is invalid";
+				
+				java.sql.Timestamp date = new Timestamp(new java.util.Date().getTime());
+				
+				long userCC = user.getCreditCardNumber();
+				
+				double debitAmount = -amount; 
+				double creditAmount = amount;
+				
+				if (debitAccount.getAccountId() == userCC)
+					debitAmount = -debitAmount;
 			
-			User user = getUserInfo(username);
-			
-			Connection connection = getConnection();
-			Statement statement = connection.createStatement();
-
-			Account debitAccount = Account.getAccount(debitActId);
-			Account creditAccount = Account.getAccount(creditActId);
-
-			if (debitAccount == null){
-				return "Originating account is invalid";
-			} 
-			
-			if (creditAccount == null)
-				return "Destination account is invalid";
-			
-			java.sql.Timestamp date = new Timestamp(new java.util.Date().getTime());
-			
-			//in real life we would want to do these updates and transaction entry creation
-			//as one atomic operation
-			
-			long userCC = user.getCreditCardNumber();
-			
-			/* this is the account that the payment will be made from, thus negative amount!*/
-			double debitAmount = -amount; 
-			/* this is the account that the payment will be made to, thus positive amount!*/
-			double creditAmount = amount;
-			
-			/* Credit card account balance is the amount owed, not amount owned 
-			 * (reverse of other accounts). Therefore we have to process balances differently*/
-			if (debitAccount.getAccountId() == userCC)
-				debitAmount = -debitAmount;
-		
-			//create transaction record
-			statement.execute("INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES ("+debitAccount.getAccountId()+",'"+date+"',"+((debitAccount.getAccountId() == userCC)?"'Cash Advance'":"'Withdrawal'")+","+debitAmount+")," +
-					  "("+creditAccount.getAccountId()+",'"+date+"',"+((creditAccount.getAccountId() == userCC)?"'Payment'":"'Deposit'")+","+creditAmount+")"); 	
-
-			Log4AltoroJ.getInstance().logTransaction(debitAccount.getAccountId()+" - "+ debitAccount.getAccountName(), creditAccount.getAccountId()+" - "+ creditAccount.getAccountName(), amount);
-			
-			if (creditAccount.getAccountId() == userCC)
-				 creditAmount = -creditAmount;
-			
-			//add cash advance fee since the money transfer was made from the credit card 
-			if (debitAccount.getAccountId() == userCC){
-				statement.execute("INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES ("+debitAccount.getAccountId()+",'"+date+"','Cash Advance Fee',"+CASH_ADVANCE_FEE+")");
-				debitAmount += CASH_ADVANCE_FEE;
-				Log4AltoroJ.getInstance().logTransaction(String.valueOf(userCC), "N/A", CASH_ADVANCE_FEE);
+				//create transaction record for debit account
+				String sqlDebit = "INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES (?, ?, ?, ?)";
+				pstmt = connection.prepareStatement(sqlDebit);
+				pstmt.setLong(1, debitAccount.getAccountId());
+				pstmt.setTimestamp(2, date);
+				pstmt.setString(3, (debitAccount.getAccountId() == userCC) ? "Cash Advance" : "Withdrawal");
+				pstmt.setDouble(4, debitAmount);
+				pstmt.executeUpdate();
+	
+				//create transaction record for credit account
+				String sqlCredit = "INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES (?, ?, ?, ?)";
+				pstmt = connection.prepareStatement(sqlCredit);
+				pstmt.setLong(1, creditAccount.getAccountId());
+				pstmt.setTimestamp(2, date);
+				pstmt.setString(3, (creditAccount.getAccountId() == userCC) ? "Payment" : "Deposit");
+				pstmt.setDouble(4, creditAmount);
+				pstmt.executeUpdate();
+	
+				Log4AltoroJ.getInstance().logTransaction(debitAccount.getAccountId()+" - "+ debitAccount.getAccountName(), creditAccount.getAccountId()+" - "+ creditAccount.getAccountName(), amount);
+				
+				if (creditAccount.getAccountId() == userCC)
+					 creditAmount = -creditAmount;
+				
+				if (debitAccount.getAccountId() == userCC){
+					String sqlFee = "INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES (?, ?, 'Cash Advance Fee', ?)";
+					pstmt = connection.prepareStatement(sqlFee);
+					pstmt.setLong(1, debitAccount.getAccountId());
+					pstmt.setTimestamp(2, date);
+					pstmt.setDouble(3, CASH_ADVANCE_FEE);
+					pstmt.executeUpdate();
+					debitAmount += CASH_ADVANCE_FEE;
+					Log4AltoroJ.getInstance().logTransaction(String.valueOf(userCC), "N/A", CASH_ADVANCE_FEE);
+				}
+							
+				//update account balances
+				String sqlUpdateDebit = "UPDATE ACCOUNTS SET BALANCE = ? WHERE ACCOUNT_ID = ?";
+				pstmt = connection.prepareStatement(sqlUpdateDebit);
+				pstmt.setDouble(1, debitAccount.getBalance() + debitAmount);
+				pstmt.setLong(2, debitAccount.getAccountId());
+				pstmt.executeUpdate();
+	
+				String sqlUpdateCredit = "UPDATE ACCOUNTS SET BALANCE = ? WHERE ACCOUNT_ID = ?";
+				pstmt = connection.prepareStatement(sqlUpdateCredit);
+				pstmt.setDouble(1, creditAccount.getBalance() + creditAmount);
+				pstmt.setLong(2, creditAccount.getAccountId());
+				pstmt.executeUpdate();
+	
+				connection.commit(); // Commit transaction block
+				
+				return null;
+				
+			} catch (SQLException e) {
+				try {
+					connection.rollback(); // Rollback transaction on error
+				} catch (SQLException se) {
+					// Handle rollback error
+				}
+				return "Transaction failed. Please try again later.";
+			} finally {
+				try {
+					if (pstmt != null) pstmt.close();
+					if (connection != null) connection.close();
+				} catch (SQLException se) {
+					// Handle resources cleanup error
+				}
 			}
-						
-			//update account balances
-			statement.execute("UPDATE ACCOUNTS SET BALANCE = " + (debitAccount.getBalance()+debitAmount) + " WHERE ACCOUNT_ID = " + debitAccount.getAccountId());
-			statement.execute("UPDATE ACCOUNTS SET BALANCE = " + (creditAccount.getBalance()+creditAmount) + " WHERE ACCOUNT_ID = " + creditAccount.getAccountId());
-			
-			return null;
-			
-		} catch (SQLException e) {
-			return "Transaction failed. Please try again later.";
 		}
-	}
 
 
 	/**
