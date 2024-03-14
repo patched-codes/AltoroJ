@@ -18,6 +18,7 @@ IBM AltoroJ
 package com.ibm.security.appscan.altoromutual.servlet;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -44,11 +45,11 @@ public class CCApplyServlet extends HttpServlet {
 		//redirect to success page
 		
 		try {
-			String passwd = request.getParameter("passwd");
+			char[] passwdChars = request.getParameter("passwd").toCharArray();
 			User user = (User)(request.getSession().getAttribute(ServletUtil.SESSION_ATTR_USER));
 			
 			//correct password entered
-			if (DBUtil.isValidUser(user.getUsername(), passwd.trim())) {
+			if (DBUtil.isValidUser(user.getUsername(), new String(passwdChars).trim())) {
 				RequestDispatcher dispatcher = request.getRequestDispatcher("/bank/applysuccess.jsp");
 				dispatcher.forward(request, response);	
 			}
@@ -57,6 +58,9 @@ public class CCApplyServlet extends HttpServlet {
 			request.getSession().setAttribute("loginError", "Login Failed: We're sorry, but this username or password was not found in our system. Please try again.");
 			RequestDispatcher dispatcher = request.getRequestDispatcher("/bank/apply.jsp");
 			dispatcher.forward(request, response);
+			
+			// Clear the password array for security purposes
+			Arrays.fill(passwdChars, '0');
 			
 		} catch (Exception e) {
 			response.sendError(500);
