@@ -9,14 +9,37 @@
   </style>
   <script>
 
+    function validateURL(url) {
+      // Create a link element to leverage the browser's URL parsing
+      var parser = document.createElement('a');
+      parser.href = url;
+
+      // Check if the URL's protocol is HTTP or HTTPS
+      if (parser.protocol !== "http:" && parser.protocol !== "https:") {
+        throw new Error('Invalid protocol');
+      }
+
+      // Check if the URL's host is the same as the current location's host
+      if (parser.host !== window.location.host) {
+        throw new Error('URL host does not match the current host');
+      }
+
+      return url;
+    }
+
     function go() {
 	    var iPos = document.URL.indexOf("url=")+4;
     	var sDst = document.URL.substring(iPos,document.URL.length); 
-        if (window.opener) {
-      		window.opener.location.href = sDst;
-      		cl();
-        } else {
-        	window.location.href = sDst;
+        try {
+          var validatedURL = validateURL(sDst);
+          if (window.opener) {
+            window.opener.location.href = validatedURL;
+            cl();
+          } else {
+            window.location.href = validatedURL;
+          }
+        } catch (e) {
+          console.error(e.message);
         }
     }
 
@@ -28,11 +51,16 @@
   	var sDst = document.URL.substring(iPos,document.URL.length);
     // if redirection is in the application's domain, don't ask for authorization
 	if ( sDst.indexOf("http") == 0 && sDst.indexOf(document.location.hostname) != -1 ) {
-		if (window.opener) {
-      		window.opener.location.href = "http" + sDst.substring(4);
-      		cl();
-        } else {
-        	window.location.href = "http" + sDst.substring(4);
+		try {
+          var validatedURL = validateURL("http" + sDst.substring(4));
+          if (window.opener) {
+            window.opener.location.href = validatedURL;
+            cl();
+          } else {
+            window.location.href = validatedURL;
+          }
+        } catch (e) {
+          console.error(e.message);
         }
 	}
 
@@ -47,7 +75,7 @@
       <td>
         <p>This hyperlink allows you to access a third party website:
         <br /><br />
-        <b><script>document.write(encodeURI(sDst));</script></b>
+        <b><script>document.write(encodeURI(sDst.replace(/</g, "&lt;").replace(/>/g, "&gt;")));</script></b>
         <br /><br />
         Please read the privacy policy of the linked website, which
         may differ from the privacy policy of the Altoro Mutual website.
@@ -64,10 +92,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
