@@ -44,11 +44,11 @@ public class CCApplyServlet extends HttpServlet {
 		//redirect to success page
 		
 		try {
-			String passwd = request.getParameter("passwd");
+			char[] passwd = request.getParameter("passwd").toCharArray();
 			User user = (User)(request.getSession().getAttribute(ServletUtil.SESSION_ATTR_USER));
 			
 			//correct password entered
-			if (DBUtil.isValidUser(user.getUsername(), passwd.trim())) {
+			if (DBUtil.isValidUser(user.getUsername(), new String(passwd).trim())) {
 				RequestDispatcher dispatcher = request.getRequestDispatcher("/bank/applysuccess.jsp");
 				dispatcher.forward(request, response);	
 			}
@@ -61,8 +61,9 @@ public class CCApplyServlet extends HttpServlet {
 		} catch (Exception e) {
 			response.sendError(500);
 		}
-				
-
+		finally {
+			// Manually clear the password array for security purposes
+			java.util.Arrays.fill(passwd, '0');
+		}
 	}
-
 }
