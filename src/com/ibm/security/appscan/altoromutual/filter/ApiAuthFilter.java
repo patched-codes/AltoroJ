@@ -60,16 +60,18 @@ public class ApiAuthFilter implements ContainerRequestFilter {
 		//Get username password and date 
 		StringTokenizer tokenizer = new StringTokenizer(accessToken,":");
 		String username = new String(Base64.decodeBase64(tokenizer.nextToken()));
-		String password = new String(Base64.decodeBase64(tokenizer.nextToken()));
+		char[] password = Base64.decodeBase64(tokenizer.nextToken());
 					
 		try {
-			if(!DBUtil.isValidUser(username, password)){
+			if(!DBUtil.isValidUser(username, new String(password))){
 				requestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
 			            .entity(NOT_LOGGED_IN_ERROR).build());
 				return;
 			}
 		} catch (SQLException e) {
 			requestContext.abortWith(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("An error has occurred: "+e.getLocalizedMessage()).build());
-		}
+		} finally {
+            java.util.Arrays.fill(password, '0');
+        }
 	}
 }
