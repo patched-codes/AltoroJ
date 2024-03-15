@@ -35,7 +35,7 @@ IBM AltoroJ
 		if (content == null)
 			content = "default.htm";
 		else
-			content = request.getParameter("content");
+			content = ServletUtil.sanitizeForJSP(ServletUtil.sanitizeForOSCommandInjection(request.getParameter("content")));
 		
 		if (ServletUtil.isAppPropertyTrue("advancedStaticPageProcessing")){
 			String path  = request.getSession().getServletContext().getRealPath("/static");
@@ -88,19 +88,19 @@ IBM AltoroJ
 					}
 
 				%>
-				<%=text %>
+				<%= ServletUtil.sanitizeForJSP(text) %>
 			<%  } catch (Exception e) { %>
-				<p>Failed due to <%= ServletUtil.sanitzieHtmlWithRegex(e.getLocalizedMessage()) %></p>
+				<p>Failed due to <%= ServletUtil.sanitizeForJSP(ServletUtil.sanitizeHtmlWithRegex(e.getLocalizedMessage())) %></p>
 	 		<% } %>
 		<% 
 		} else {
-			content = "static/"+content;
+			content = "static/"+ServletUtil.sanitizeForJSP(content);
 		%>
 		
 		<%  try { %>
-			<jsp:include page="<%= content %>"/>
+			<jsp:include page="<%= ServletUtil.sanitizeForJSP(content) %>"/>
 		<%  } catch (Exception e) { %>
-			<p>Failed due to <%= ServletUtil.sanitzieHtmlWithRegex(e.getLocalizedMessage()) %></p>
+			<p>Failed due to <%= ServletUtil.sanitizeForJSP(ServletUtil.sanitizeHtmlWithRegex(e.getLocalizedMessage())) %></p>
  		<% } 
 		}%>
     </td>
