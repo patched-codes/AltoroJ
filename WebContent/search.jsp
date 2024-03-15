@@ -27,6 +27,7 @@ IBM AltoroJ
 	<jsp:include page="toc.jspf"/>
     <td valign="top" colspan="3" class="bb">
 		<%@page import="com.ibm.security.appscan.altoromutual.util.ServletUtil"%>
+		<%@page import="org.apache.commons.text.StringEscapeUtils"%>
 	
 		<%
 		String query = request.getParameter("query");
@@ -41,7 +42,7 @@ IBM AltoroJ
 		
 		<p>No results were found for the query:<br /><br />
 		
-		<%= query %>
+		<%= StringEscapeUtils.escapeHtml4(query) %>
 		
 		</div>    
     </td>	
