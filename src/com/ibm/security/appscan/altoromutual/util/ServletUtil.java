@@ -339,24 +339,26 @@ public class ServletUtil {
 
 	public static Cookie establishSession(String username, HttpSession session){
 		try{
-			User user = DBUtil.getUserInfo(username);
+			User user;
+			try (PreparedStatement statement = DBUtil.getConnection().prepareStatement("SELECT * FROM users WHERE username = ?")) {
+	            statement.setString(1, username);
+	            try (ResultSet resultSet = statement.executeQuery()) {
+	                resultSet.next();
+	                user = new User(resultSet.getString("username"));
+	            }
+	        }
+	        
 			Account[] accounts = user.getAccounts();
 		    String accountStringList = Account.toBase64List(accounts);
 		    Cookie accountCookie = new Cookie(ServletUtil.ALTORO_COOKIE, accountStringList);
 			session.setAttribute(ServletUtil.SESSION_ATTR_USER, user);
-		    return accountCookie;
-		}
-		catch(SQLException e){
-			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	static public boolean isLoggedin(HttpServletRequest request){
-		try {
-			// Check user is logged in
-			User user = (User) request.getSession().getAttribute(
-					ServletUtil.SESSION_ATTR_USER);
+						static public boolean isLoggedin(HttpServletRequest request){
+						    User user = (User) request.getSession().getAttribute(ServletUtil.SESSION_ATTR_USER);
+						    if (user == null) {
+						        return false;
+						    }
+						    return true;
+						}
 			if (user == null)
 				return false;
 		} catch (Exception e) {
