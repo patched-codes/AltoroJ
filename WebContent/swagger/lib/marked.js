@@ -308,7 +308,7 @@ Lexer.prototype.token = function(src, top, bq) {
         if (~item.indexOf('\n ')) {
           space -= item.length;
           item = !this.options.pedantic
-            ? item.replace(new RegExp('^ {1,' + space + '}', 'gm'), '')
+            ? item.replace(/^ {1,}/gm, '')
             : item.replace(/^ {1,4}/gm, '');
         }
 
@@ -1102,7 +1102,7 @@ function replace(regex, opt) {
     if (!name) return new RegExp(regex, opt);
     val = val.source || val;
     val = val.replace(/(^|[^\[])\^/g, '$1');
-    regex = regex.replace(name, val);
+    regex = regex.replace(new RegExp(name, 'g'), val);
     return self;
   };
 }

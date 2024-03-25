@@ -41,9 +41,9 @@ public class AdminServlet extends HttpServlet {
 		
 		//add account
 		if (request.getRequestURL().toString().endsWith("addAccount")){
-			String username = request.getParameter("username");
-			String acctType = request.getParameter("accttypes");
-			if (username == null || acctType == null || username.trim().length() == 0 || acctType.trim().length() == 0)
+			String username = request.getParameter("username").trim();
+			String acctType = request.getParameter("accttypes").trim();
+			if (username.isEmpty() || acctType.isEmpty())
 				message = "An error has occurred. Please try again later.";
 			else {
 				String error = DBUtil.addAccount(username, acctType);
@@ -56,12 +56,10 @@ public class AdminServlet extends HttpServlet {
 		else if (request.getRequestURL().toString().endsWith("addUser")){
 			String firstname = request.getParameter("firstname");
 			String lastname = request.getParameter("lastname");
-			String username = request.getParameter("username");
-			String password1 = request.getParameter("password1");
-			String password2 = request.getParameter("password2");
-			if (username == null || username.trim().length() == 0
-				|| password1 == null || password1.trim().length() == 0
-				|| password2 == null || password2.trim().length() == 0)
+			String username = request.getParameter("username").trim();
+			String password1 = request.getParameter("password1").trim();
+			String password2 = request.getParameter("password2").trim();
+			if (username.isEmpty() || password1.isEmpty() || password2.isEmpty())
 				message = "An error has occurred. Please try again later.";
 			
 			if (firstname == null){
@@ -82,18 +80,15 @@ public class AdminServlet extends HttpServlet {
 				if (error != null)
 					message = error;
 			}
-			
 		}
 		
 		//change password
 		else if (request.getRequestURL().toString().endsWith("changePassword")){
-			String username = request.getParameter("username");
-			String password1 = request.getParameter("password1");
-			String password2 = request.getParameter("password2");
-			if (username == null || username.trim().length() == 0
-					|| password1 == null || password1.trim().length() == 0
-					|| password2 == null || password2.trim().length() == 0)
-					message = "An error has occurred. Please try again later.";
+			String username = request.getParameter("username").trim();
+			String password1 = request.getParameter("password1").trim();
+			String password2 = request.getParameter("password2").trim();
+			if (username.isEmpty() || password1.isEmpty() || password2.isEmpty())
+				message = "An error has occurred. Please try again later.";
 			
 			if (message == null && !password1.equals(password2)){
 				message = "Entered passwords did not match.";
@@ -119,5 +114,7 @@ public class AdminServlet extends HttpServlet {
 		response.sendRedirect("admin.jsp");
 		return ;
 	}
+
+}
 
 }
