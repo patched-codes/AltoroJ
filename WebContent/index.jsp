@@ -80,15 +80,16 @@ IBM AltoroJ
 	                         is = proc.getInputStream();
 	                 }
 
-					InputStreamReader isr = new InputStreamReader(is);
-					BufferedReader br = new BufferedReader(isr);
-					String line;
-					while ((line = br.readLine()) != null) {
-						text += line + "\n";
-					}
+	                 InputStreamReader isr = new InputStreamReader(is);
+					 BufferedReader br = new BufferedReader(isr);
+					 String line;
+					 while ((line = br.readLine()) != null) {
+						 text += line + "\n";
+					 }
+					 
+					 out.println(ServletUtil.sanitzieHtmlWithRegex(text));
 
 				%>
-				<%=text %>
 			<%  } catch (Exception e) { %>
 				<p>Failed due to <%= ServletUtil.sanitzieHtmlWithRegex(e.getLocalizedMessage()) %></p>
 	 		<% } %>
@@ -101,10 +102,14 @@ IBM AltoroJ
 			<jsp:include page="<%= content %>"/>
 		<%  } catch (Exception e) { %>
 			<p>Failed due to <%= ServletUtil.sanitzieHtmlWithRegex(e.getLocalizedMessage()) %></p>
- 		<% } 
+		 <% } 
 		}%>
     </td>
 	
+</div>
+
+<jsp:include page="footer.jspf"/>
+    
 </div>
 
 <jsp:include page="footer.jspf"/>
