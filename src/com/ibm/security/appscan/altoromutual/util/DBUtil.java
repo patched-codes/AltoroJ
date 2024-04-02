@@ -296,13 +296,13 @@ public class DBUtil {
 	 * @return
 	 */
 	public static String transferFunds(String username, long creditActId, long debitActId, double amount) {
-				
+			
 		try {
 			
 			User user = getUserInfo(username);
 			
 			Connection connection = getConnection();
-			Statement statement = connection.createStatement();
+			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES (?,?,?,?), (?,?,?,?,?)");
 
 			Account debitAccount = Account.getAccount(debitActId);
 			Account creditAccount = Account.getAccount(creditActId);
@@ -332,8 +332,15 @@ public class DBUtil {
 				debitAmount = -debitAmount;
 		
 			//create transaction record
-			statement.execute("INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES ("+debitAccount.getAccountId()+",'"+date+"',"+((debitAccount.getAccountId() == userCC)?"'Cash Advance'":"'Withdrawal'")+","+debitAmount+")," +
-					  "("+creditAccount.getAccountId()+",'"+date+"',"+((creditAccount.getAccountId() == userCC)?"'Payment'":"'Deposit'")+","+creditAmount+")"); 	
+			preparedStatement.setLong(1, debitAccount.getAccountId());
+			preparedStatement.setTimestamp(2, date);
+			preparedStatement.setString(3, (debitAccount.getAccountId() == userCC) ? "Cash Advance" : "Withdrawal");
+			preparedStatement.setDouble(4, debitAmount);
+			preparedStatement.setLong(5, creditAccount.getAccountId());
+			preparedStatement.setTimestamp(6, date);
+			preparedStatement.setString(7, (creditAccount.getAccountId() == userCC) ? "Payment" : "Deposit");
+			preparedStatement.setDouble(8, creditAmount);
+			preparedStatement.execute();
 
 			Log4AltoroJ.getInstance().logTransaction(debitAccount.getAccountId()+" - "+ debitAccount.getAccountName(), creditAccount.getAccountId()+" - "+ creditAccount.getAccountName(), amount);
 			
@@ -342,14 +349,21 @@ public class DBUtil {
 			
 			//add cash advance fee since the money transfer was made from the credit card 
 			if (debitAccount.getAccountId() == userCC){
-				statement.execute("INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES ("+debitAccount.getAccountId()+",'"+date+"','Cash Advance Fee',"+CASH_ADVANCE_FEE+")");
+				preparedStatement = connection.prepareStatement("INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES (?,?,?,?)");
+				preparedStatement.setLong(1, debitAccount.getAccountId());
+				preparedStatement.setTimestamp(2, date);
+				preparedStatement.setString(3, "Cash Advance Fee");
+				preparedStatement.setDouble(4, CASH_ADVANCE_FEE);
+				preparedStatement.execute();
 				debitAmount += CASH_ADVANCE_FEE;
 				Log4AltoroJ.getInstance().logTransaction(String.valueOf(userCC), "N/A", CASH_ADVANCE_FEE);
 			}
 						
 			//update account balances
-			statement.execute("UPDATE ACCOUNTS SET BALANCE = " + (debitAccount.getBalance()+debitAmount) + " WHERE ACCOUNT_ID = " + debitAccount.getAccountId());
-			statement.execute("UPDATE ACCOUNTS SET BALANCE = " + (creditAccount.getBalance()+creditAmount) + " WHERE ACCOUNT_ID = " + creditAccount.getAccountId());
+			double newDebitBalance = debitAccount.getBalance() + debitAmount;
+			double newCreditBalance = creditAccount.getBalance() + creditAmount;
+			statement.executeUpdate("UPDATE ACCOUNTS SET BALANCE = " + newDebitBalance + " WHERE ACCOUNT_ID = " + debitAccount.getAccountId());
+			statement.executeUpdate("UPDATE ACCOUNTS SET BALANCE = " + newCreditBalance + " WHERE ACCOUNT_ID = " + creditAccount.getAccountId());
 			
 			return null;
 			
