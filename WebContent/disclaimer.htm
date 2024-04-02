@@ -8,26 +8,25 @@
   -->
   </style>
   <script>
-
     function go() {
-	    var iPos = document.URL.indexOf("url=")+4;
-    	var sDst = document.URL.substring(iPos,document.URL.length); 
-        if (window.opener) {
-      		window.opener.location.href = sDst;
-      		cl();
-        } else {
-        	window.location.href = sDst;
-        }
+      var iPos = document.URL.indexOf("url=") + 4;
+      var sDst = document.URL.substring(iPos, document.URL.length);
+      if (window.opener) {
+        window.opener.location.href = sDst;
+        cl();
+      } else {
+        window.location.href = sDst;
+      }
     }
 
     function cl() {
       window.close();
     }
 
-    var iPos = document.URL.indexOf("url=")+4;
-  	var sDst = document.URL.substring(iPos,document.URL.length);
+    var iPos = document.URL.indexOf("url=") + 4;
+    var sDst = document.URL.substring(iPos, document.URL.length);
     // if redirection is in the application's domain, don't ask for authorization
-	if ( sDst.indexOf("http") == 0 && sDst.indexOf(document.location.hostname) != -1 ) {
+	if (sDst.indexOf("http") == 0 && sDst.indexOf(document.location.hostname) != -1 ) {
 		if (window.opener) {
       		window.opener.location.href = "http" + sDst.substring(4);
       		cl();
@@ -64,10 +63,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
