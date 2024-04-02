@@ -37,7 +37,7 @@ IBM AltoroJ
 			  <table>
 			    <tr>
 			      <td colspan="2">
-			        <div style="font-weight: bold; font-size: 12px; color: red;" id="message"><%=(request.getAttribute("message_subscribe")!=null)?request.getAttribute("message_subscribe"):"" %></div>
+			        <div style="font-weight: bold; font-size: 12px; color: red;" id="message"><%=((String)request.getAttribute("message_subscribe")!=null)?(String)request.getAttribute("message_subscribe"):"" %></div>
 			      </td>
 			    </tr>
 			    <tr>
