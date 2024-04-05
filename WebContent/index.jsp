@@ -88,7 +88,7 @@ IBM AltoroJ
 					}
 
 				%>
-				<%=text %>
+				<%=ServletUtil.sanitzieHtmlWithRegex(text) %>
 			<%  } catch (Exception e) { %>
 				<p>Failed due to <%= ServletUtil.sanitzieHtmlWithRegex(e.getLocalizedMessage()) %></p>
 	 		<% } %>

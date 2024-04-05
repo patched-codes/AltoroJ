@@ -302,8 +302,8 @@ public class DBUtil {
 			User user = getUserInfo(username);
 			
 			Connection connection = getConnection();
-			Statement statement = connection.createStatement();
-
+			PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES (?,?,?,?), (?,?,?,?,?)");
+			
 			Account debitAccount = Account.getAccount(debitActId);
 			Account creditAccount = Account.getAccount(creditActId);
 
@@ -311,8 +311,9 @@ public class DBUtil {
 				return "Originating account is invalid";
 			} 
 			
-			if (creditAccount == null)
+			if (creditAccount == null) {
 				return "Destination account is invalid";
+			}
 			
 			java.sql.Timestamp date = new Timestamp(new java.util.Date().getTime());
 			
@@ -328,28 +329,52 @@ public class DBUtil {
 			
 			/* Credit card account balance is the amount owed, not amount owned 
 			 * (reverse of other accounts). Therefore we have to process balances differently*/
-			if (debitAccount.getAccountId() == userCC)
+			if (debitAccount.getAccountId() == userCC) {
 				debitAmount = -debitAmount;
-		
+			}
+			
 			//create transaction record
-			statement.execute("INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES ("+debitAccount.getAccountId()+",'"+date+"',"+((debitAccount.getAccountId() == userCC)?"'Cash Advance'":"'Withdrawal'")+","+debitAmount+")," +
-					  "("+creditAccount.getAccountId()+",'"+date+"',"+((creditAccount.getAccountId() == userCC)?"'Payment'":"'Deposit'")+","+creditAmount+")"); 	
-
+			preparedStatement.setLong(1, debitAccount.getAccountId());
+			preparedStatement.setTimestamp(2, date);
+			preparedStatement.setString(3, (debitAccount.getAccountId() == userCC) ? "Cash Advance" : "Withdrawal");
+			preparedStatement.setDouble(4, debitAmount);
+			
+			preparedStatement.setLong(5, creditAccount.getAccountId());
+			preparedStatement.setTimestamp(6, date);
+			preparedStatement.setString(7, (creditAccount.getAccountId() == userCC) ? "Payment" : "Deposit");
+			preparedStatement.setDouble(8, creditAmount);
+			
+			preparedStatement.executeUpdate();
+			
 			Log4AltoroJ.getInstance().logTransaction(debitAccount.getAccountId()+" - "+ debitAccount.getAccountName(), creditAccount.getAccountId()+" - "+ creditAccount.getAccountName(), amount);
 			
-			if (creditAccount.getAccountId() == userCC)
-				 creditAmount = -creditAmount;
+			if (creditAccount.getAccountId() == userCC) {
+				creditAmount = -creditAmount;
+			}
 			
 			//add cash advance fee since the money transfer was made from the credit card 
-			if (debitAccount.getAccountId() == userCC){
-				statement.execute("INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES ("+debitAccount.getAccountId()+",'"+date+"','Cash Advance Fee',"+CASH_ADVANCE_FEE+")");
+			if (debitAccount.getAccountId() == userCC) {
+				PreparedStatement feeStatement = connection.prepareStatement("INSERT INTO TRANSACTIONS (ACCOUNTID, DATE, TYPE, AMOUNT) VALUES (?,?,?,?)");
+				feeStatement.setLong(1, debitAccount.getAccountId());
+				feeStatement.setTimestamp(2, date);
+				feeStatement.setString(3, "Cash Advance Fee");
+				feeStatement.setDouble(4, CASH_ADVANCE_FEE);
+				feeStatement.executeUpdate();
+				
 				debitAmount += CASH_ADVANCE_FEE;
+				
 				Log4AltoroJ.getInstance().logTransaction(String.valueOf(userCC), "N/A", CASH_ADVANCE_FEE);
 			}
 						
 			//update account balances
-			statement.execute("UPDATE ACCOUNTS SET BALANCE = " + (debitAccount.getBalance()+debitAmount) + " WHERE ACCOUNT_ID = " + debitAccount.getAccountId());
-			statement.execute("UPDATE ACCOUNTS SET BALANCE = " + (creditAccount.getBalance()+creditAmount) + " WHERE ACCOUNT_ID = " + creditAccount.getAccountId());
+			statement.execute("UPDATE ACCOUNTS SET BALANCE = ? WHERE ACCOUNT_ID = ?");
+			statement.setDouble(1, debitAccount.getBalance() + debitAmount);
+			statement.setLong(2, debitAccount.getAccountId());
+			statement.executeUpdate();
+			
+			statement.setDouble(1, creditAccount.getBalance() + creditAmount);
+			statement.setLong(2, creditAccount.getAccountId());
+			statement.executeUpdate();
 			
 			return null;
 			
