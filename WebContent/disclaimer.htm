@@ -35,6 +35,8 @@
         	window.location.href = "http" + sDst.substring(4);
         }
 	}
+	
+	document.getElementById("destination").textContent = decodeURI(sDst);
 
 	</script>
 </head>
@@ -47,7 +49,7 @@
       <td>
         <p>This hyperlink allows you to access a third party website:
         <br /><br />
-        <b><script>document.write(encodeURI(sDst));</script></b>
+        <b id="destination"></b>
         <br /><br />
         Please read the privacy policy of the linked website, which
         may differ from the privacy policy of the Altoro Mutual website.
@@ -64,10 +66,3 @@
 
 </body>
 </html>
-
-
-
-
-
-
-
