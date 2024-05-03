@@ -92,6 +92,10 @@ public class LoginServlet extends HttpServlet {
 		//Handle the cookie using ServletUtil.establishSession(String)
 		try{
 			Cookie accountCookie = ServletUtil.establishSession(username,session);
+			//Set the HttpOnly flag for the cookie
+			accountCookie.setHttpOnly(true);
+			//Set the secure flag for the cookie
+			accountCookie.setSecure(true);
 			response.addCookie(accountCookie);
 			response.sendRedirect(request.getContextPath()+"/bank/main.jsp");
 			}
@@ -105,3 +109,4 @@ public class LoginServlet extends HttpServlet {
 	}
 
 }
+
