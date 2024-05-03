@@ -308,7 +308,8 @@ Lexer.prototype.token = function(src, top, bq) {
         if (~item.indexOf('\n ')) {
           space -= item.length;
           item = !this.options.pedantic
-            ? item.replace(new RegExp('^ {1,' + space + '}', 'gm'), '')
+            ? item.replace(/^ {1,6}/gm, '')
+
             : item.replace(/^ {1,4}/gm, '');
         }
 
@@ -1095,8 +1096,8 @@ function unescape(html) {
   });
 }
 
-function replace(regex, opt) {
-  regex = regex.source;
+function replace(hardcodedRegex, opt) {
+  const regex = hardcodedRegex.source;
   opt = opt || '';
   return function self(name, val) {
     if (!name) return new RegExp(regex, opt);
@@ -1106,6 +1107,7 @@ function replace(regex, opt) {
     return self;
   };
 }
+
 
 function noop() {}
 noop.exec = noop;

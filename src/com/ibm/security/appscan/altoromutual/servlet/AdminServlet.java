@@ -59,9 +59,9 @@ public class AdminServlet extends HttpServlet {
 			String username = request.getParameter("username");
 			String password1 = request.getParameter("password1");
 			String password2 = request.getParameter("password2");
-			if (username == null || username.trim().length() == 0
-				|| password1 == null || password1.trim().length() == 0
-				|| password2 == null || password2.trim().length() == 0)
+			if ( (username == null || username.trim().length() == 0)
+					|| (password1 == null || password1.trim().length() == 0)
+					|| (password2 == null || password2.trim().length() == 0) )
 				message = "An error has occurred. Please try again later.";
 			
 			if (firstname == null){
@@ -90,10 +90,10 @@ public class AdminServlet extends HttpServlet {
 			String username = request.getParameter("username");
 			String password1 = request.getParameter("password1");
 			String password2 = request.getParameter("password2");
-			if (username == null || username.trim().length() == 0
-					|| password1 == null || password1.trim().length() == 0
-					|| password2 == null || password2.trim().length() == 0)
-					message = "An error has occurred. Please try again later.";
+			if ( (username == null || username.trim().length() == 0) 
+					|| (password1 == null || password1.trim().length() == 0) 
+					|| (password2 == null || password2.trim().length() == 0) )
+				message = "An error has occurred. Please try again later.";
 			
 			if (message == null && !password1.equals(password2)){
 				message = "Entered passwords did not match.";
@@ -121,3 +121,4 @@ public class AdminServlet extends HttpServlet {
 	}
 
 }
+
