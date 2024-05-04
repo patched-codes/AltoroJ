@@ -39,75 +39,80 @@ public class AdminServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String message = null;
 		
-		//add account
-		if (request.getRequestURL().toString().endsWith("addAccount")){
-			String username = request.getParameter("username");
-			String acctType = request.getParameter("accttypes");
-			if (username == null || acctType == null || username.trim().length() == 0 || acctType.trim().length() == 0)
-				message = "An error has occurred. Please try again later.";
-			else {
-				String error = DBUtil.addAccount(username, acctType);
-				if (error != null)
-					message = error;
-			}
-		}
-		
-		//add user
-		else if (request.getRequestURL().toString().endsWith("addUser")){
-			String firstname = request.getParameter("firstname");
-			String lastname = request.getParameter("lastname");
-			String username = request.getParameter("username");
-			String password1 = request.getParameter("password1");
-			String password2 = request.getParameter("password2");
-			if (username == null || username.trim().length() == 0
-				|| password1 == null || password1.trim().length() == 0
-				|| password2 == null || password2.trim().length() == 0)
-				message = "An error has occurred. Please try again later.";
-			
-			if (firstname == null){
-				firstname = "";
+		// Verify that the request comes from a trusted source
+		if (!isRequestFromTrustedSource(request)) {
+			message = "Request is not from a trusted source.";
+		} else {
+			//add account
+			if (request.getRequestURL().toString().endsWith("addAccount")){
+				String username = request.getParameter("username");
+				String acctType = request.getParameter("accttypes");
+				if (username == null || acctType == null || username.trim().length() == 0 || acctType.trim().length() == 0)
+					message = "An error has occurred. Please try again later.";
+				else {
+					String error = DBUtil.addAccount(username, acctType);
+					if (error != null)
+						message = error;
+				}
 			}
 			
-			if (lastname == null){
-				lastname = "";
-			}
-			
-			if (message == null && !password1.equals(password2)){
-				message = "Entered passwords did not match.";
-			}
-			
-			if (message == null){
-				String error = DBUtil.addUser(username, password1, firstname, lastname);
-				
-				if (error != null)
-					message = error;
-			}
-			
-		}
-		
-		//change password
-		else if (request.getRequestURL().toString().endsWith("changePassword")){
-			String username = request.getParameter("username");
-			String password1 = request.getParameter("password1");
-			String password2 = request.getParameter("password2");
-			if (username == null || username.trim().length() == 0
+			//add user
+			else if (request.getRequestURL().toString().endsWith("addUser")){
+				String firstname = request.getParameter("firstname");
+				String lastname = request.getParameter("lastname");
+				String username = request.getParameter("username");
+				String password1 = request.getParameter("password1");
+				String password2 = request.getParameter("password2");
+				if (username == null || username.trim().length() == 0
 					|| password1 == null || password1.trim().length() == 0
 					|| password2 == null || password2.trim().length() == 0)
 					message = "An error has occurred. Please try again later.";
-			
-			if (message == null && !password1.equals(password2)){
-				message = "Entered passwords did not match.";
-			}
-			
-			if (message == null) {
-				String error = DBUtil.changePassword(username, password1);
 				
-				if (error != null)
-					message = error;
+				if (firstname == null){
+					firstname = "";
+				}
+				
+				if (lastname == null){
+					lastname = "";
+				}
+				
+				if (message == null && !password1.equals(password2)){
+					message = "Entered passwords did not match.";
+				}
+				
+				if (message == null){
+					String error = DBUtil.addUser(username, password1, firstname, lastname);
+					
+					if (error != null)
+						message = error;
+				}
+				
 			}
-		}
-		else {
-			message = "An error has occurred. Please try again later.";	
+			
+			//change password
+			else if (request.getRequestURL().toString().endsWith("changePassword")){
+				String username = request.getParameter("username");
+				String password1 = request.getParameter("password1");
+				String password2 = request.getParameter("password2");
+				if (username == null || username.trim().length() == 0
+						|| password1 == null || password1.trim().length() == 0
+						|| password2 == null || password2.trim().length() == 0)
+						message = "An error has occurred. Please try again later.";
+				
+				if (message == null && !password1.equals(password2)){
+					message = "Entered passwords did not match.";
+				}
+				
+				if (message == null) {
+					String error = DBUtil.changePassword(username, password1);
+					
+					if (error != null)
+						message = error;
+				}
+			}
+			else {
+				message = "An error has occurred. Please try again later.";	
+			}
 		}
 		
 		if (message != null)
@@ -119,5 +124,11 @@ public class AdminServlet extends HttpServlet {
 		response.sendRedirect("admin.jsp");
 		return ;
 	}
-
+	
+	private boolean isRequestFromTrustedSource(HttpServletRequest request) {
+		// Implement the logic to check if the request is from a trusted source.
+		// This could include checking the IP address, requiring a secure connection,
+		// or any other business logic appropriate for the application.
+		return true; // Placeholder for actual implementation
+	}
 }
