@@ -343,6 +343,8 @@ public class ServletUtil {
 			Account[] accounts = user.getAccounts();
 		    String accountStringList = Account.toBase64List(accounts);
 		    Cookie accountCookie = new Cookie(ServletUtil.ALTORO_COOKIE, accountStringList);
+		    accountCookie.setSecure(true); // Ensure the cookie is sent only over a secure protocol like HTTPS
+		    accountCookie.setHttpOnly(true); // Mitigate the risk of client side script accessing the protected cookie
 			session.setAttribute(ServletUtil.SESSION_ATTR_USER, user);
 		    return accountCookie;
 		}
