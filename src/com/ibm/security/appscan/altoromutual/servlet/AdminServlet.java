@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.ibm.security.appscan.altoromutual.util.DBUtil;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * This servlet handles site admin operations
@@ -115,7 +116,8 @@ public class AdminServlet extends HttpServlet {
 		else
 			message = "Requested operation has completed successfully.";
 		
-		request.getSession().setAttribute("message", message);
+		String safeMessage = StringEscapeUtils.escapeHtml4(message);
+		request.getSession().setAttribute("message", safeMessage);
 		response.sendRedirect("admin.jsp");
 		return ;
 	}
