@@ -1,20 +1,3 @@
-/**
- This application is for demonstration use only. It contains known application security
-vulnerabilities that were created expressly for demonstrating the functionality of
-application security testing tools. These vulnerabilities may present risks to the
-technical environment in which the application is installed. You must delete and
-uninstall this demonstration application upon completion of the demonstration for
-which it is intended. 
-
-IBM DISCLAIMS ALL LIABILITY OF ANY KIND RESULTING FROM YOUR USE OF THE APPLICATION
-OR YOUR FAILURE TO DELETE THE APPLICATION FROM YOUR ENVIRONMENT UPON COMPLETION OF
-A DEMONSTRATION. IT IS YOUR RESPONSIBILITY TO DETERMINE IF THE PROGRAM IS APPROPRIATE
-OR SAFE FOR YOUR TECHNICAL ENVIRONMENT. NEVER INSTALL THE APPLICATION IN A PRODUCTION
-ENVIRONMENT. YOU ACKNOWLEDGE AND ACCEPT ALL RISKS ASSOCIATED WITH THE USE OF THE APPLICATION.
-
-IBM AltoroJ
-(c) Copyright IBM Corp. 2008, 2013 All Rights Reserved.
- */
 package com.ibm.security.appscan.altoromutual.servlet;
 
 import java.io.IOException;
@@ -77,6 +60,13 @@ public class AdminServlet extends HttpServlet {
 			}
 			
 			if (message == null){
+				// Escape and validate the input before setting the session attribute.
+				username = request.getParameter("username").trim();
+				password1 = request.getParameter("password1").trim();
+				password2 = request.getParameter("password2").trim();
+				firstname = request.getParameter("firstname").trim();
+				lastname = request.getParameter("lastname").trim();
+								
 				String error = DBUtil.addUser(username, password1, firstname, lastname);
 				
 				if (error != null)
@@ -100,6 +90,10 @@ public class AdminServlet extends HttpServlet {
 			}
 			
 			if (message == null) {
+				// Escape and validate the input before setting the session attribute.
+				username = request.getParameter("username").trim();
+				password1 = request.getParameter("password1").trim();
+				password2 = request.getParameter("password2").trim();
 				String error = DBUtil.changePassword(username, password1);
 				
 				if (error != null)
@@ -119,5 +113,4 @@ public class AdminServlet extends HttpServlet {
 		response.sendRedirect("admin.jsp");
 		return ;
 	}
-
 }
