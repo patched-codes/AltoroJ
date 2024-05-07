@@ -88,18 +88,18 @@ public class LoginServlet extends HttpServlet {
 			response.sendRedirect("login.jsp");
 			return;
 		}
-
+		
 		//Handle the cookie using ServletUtil.establishSession(String)
 		try{
-			Cookie accountCookie = ServletUtil.establishSession(username,session);
+			Cookie accountCookie = ServletUtil.establishSession(username, session);
+			accountCookie.setHttpOnly(true);
+			accountCookie.setSecure(true);
 			response.addCookie(accountCookie);
-			response.sendRedirect(request.getContextPath()+"/bank/main.jsp");
-			}
-		catch (Exception ex){
+			response.sendRedirect(request.getContextPath() + "/bank/main.jsp");
+		} catch (Exception ex){
 			ex.printStackTrace();
 			response.sendError(500);
 		}
-			
 		
 		return;
 	}
