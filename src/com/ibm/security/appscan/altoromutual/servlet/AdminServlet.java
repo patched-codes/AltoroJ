@@ -115,9 +115,12 @@ public class AdminServlet extends HttpServlet {
 		else
 			message = "Requested operation has completed successfully.";
 		
-		request.getSession().setAttribute("message", message);
+		request.getSession().setAttribute("message", sanitizeInput(message));
 		response.sendRedirect("admin.jsp");
 		return ;
 	}
 
+	private String sanitizeInput(String input) {
+		return input.replace("<", "&lt;").replace(">", "&gt;");
+	}
 }
