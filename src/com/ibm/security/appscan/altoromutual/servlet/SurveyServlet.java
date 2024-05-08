@@ -95,10 +95,10 @@ public class SurveyServlet extends HttpServlet {
 			content = "<h1>Request Out of Order</h1>"+
 			"<div width=\"99%\"><p>It appears that you attempted to skip or repeat some areas of this survey.  Please <a href=\"survey_questions.jsp\">return to the start page</a> to begin again.</p></div>";
 		} else {		
-			request.getSession().setAttribute("surveyStep", step);
+			request.getSession().setAttribute("surveyStep", sanitizeInput(step));
 		}
 		response.setContentType("text/html");
-		response.getWriter().write(content);
+		response.getWriter().write(URLEncoder.encode(content, "UTF-8").replace("%0A", "").replace("%0D", ""));
 		response.getWriter().flush();
 		
 	}
