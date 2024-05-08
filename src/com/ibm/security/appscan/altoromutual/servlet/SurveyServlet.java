@@ -95,10 +95,23 @@ public class SurveyServlet extends HttpServlet {
 			content = "<h1>Request Out of Order</h1>"+
 			"<div width=\"99%\"><p>It appears that you attempted to skip or repeat some areas of this survey.  Please <a href=\"survey_questions.jsp\">return to the start page</a> to begin again.</p></div>";
 		} else {		
-			request.getSession().setAttribute("surveyStep", step);
+			import org.owasp.esapi.codecs.OracleCodec;
+			import org.owasp.esapi.errors.ValidationException;
+			import org.owasp.esapi.reference.DefaultValidator;
+			
+			...
+			
+			String canonicalStep;
+			try {
+			    canonicalStep = DefaultValidator.getValidInput("SurveyStep", step, "^[a-zA-Z0-9_-]{1,20}$", 20);
+			} catch (ValidationException e) {
+			    throw new RuntimeException("Invalid input", e);
+			}
+			
+			request.getSession().setAttribute("surveyStep", canonicalStep);
 		}
 		response.setContentType("text/html");
-		response.getWriter().write(content);
+    response.getWriter().write(String.valueOf(HtmlUtils.htmlEscape(content)));
 		response.getWriter().flush();
 		
 	}
