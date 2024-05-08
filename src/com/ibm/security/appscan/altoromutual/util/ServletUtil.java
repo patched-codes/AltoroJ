@@ -343,6 +343,7 @@ public class ServletUtil {
 			Account[] accounts = user.getAccounts();
 		    String accountStringList = Account.toBase64List(accounts);
 		    Cookie accountCookie = new Cookie(ServletUtil.ALTORO_COOKIE, accountStringList);
+			accountCookie.setSecure(true); 
 			session.setAttribute(ServletUtil.SESSION_ATTR_USER, user);
 		    return accountCookie;
 		}
