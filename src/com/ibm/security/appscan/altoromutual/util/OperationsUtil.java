@@ -145,7 +145,7 @@ public class OperationsUtil {
 	
 	public static String makeRandomString() {
 	    byte[] array = new byte[7]; // length is bounded by 7
-	    new Random().nextBytes(array);
+	    new SecureRandom().nextBytes(array);
 	    String generatedString = new String(array, Charset.forName("UTF-8"));
 	 
 	    return generatedString;
