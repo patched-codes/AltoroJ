@@ -95,10 +95,17 @@ public class SurveyServlet extends HttpServlet {
 			content = "<h1>Request Out of Order</h1>"+
 			"<div width=\"99%\"><p>It appears that you attempted to skip or repeat some areas of this survey.  Please <a href=\"survey_questions.jsp\">return to the start page</a> to begin again.</p></div>";
 		} else {		
-			request.getSession().setAttribute("surveyStep", step);
+			String sanitizedStep = sanitizeInput(step);
+			request.getSession().setAttribute("surveyStep", sanitizedStep);
+
+			// Assuming a sanitizeInput method exists elsewhere in your codebase:
+			// private String sanitizeInput(String input) {
+			//     // Implement sanitation logic here
+			//     return input.replaceAll("[^a-zA-Z0-9]", "");
+			// }
 		}
 		response.setContentType("text/html");
-		response.getWriter().write(content);
+		response.getWriter().write(org.apache.commons.text.StringEscapeUtils.escapeHtml4(content));
 		response.getWriter().flush();
 		
 	}
