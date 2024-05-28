@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.owasp.esapi.ESAPI;
+
 import com.ibm.security.appscan.altoromutual.util.DBUtil;
 
 /**
@@ -41,8 +43,8 @@ public class AdminServlet extends HttpServlet {
 		
 		//add account
 		if (request.getRequestURL().toString().endsWith("addAccount")){
-			String username = request.getParameter("username");
-			String acctType = request.getParameter("accttypes");
+			String username = ESAPI.encoder().canonicalize(request.getParameter("username"));
+			String acctType = ESAPI.encoder().canonicalize(request.getParameter("accttypes"));
 			if (username == null || acctType == null || username.trim().length() == 0 || acctType.trim().length() == 0)
 				message = "An error has occurred. Please try again later.";
 			else {
@@ -54,11 +56,11 @@ public class AdminServlet extends HttpServlet {
 		
 		//add user
 		else if (request.getRequestURL().toString().endsWith("addUser")){
-			String firstname = request.getParameter("firstname");
-			String lastname = request.getParameter("lastname");
-			String username = request.getParameter("username");
-			String password1 = request.getParameter("password1");
-			String password2 = request.getParameter("password2");
+			String firstname = ESAPI.encoder().canonicalize(request.getParameter("firstname"));
+			String lastname = ESAPI.encoder().canonicalize(request.getParameter("lastname"));
+			String username = ESAPI.encoder().canonicalize(request.getParameter("username"));
+			String password1 = ESAPI.encoder().canonicalize(request.getParameter("password1"));
+			String password2 = ESAPI.encoder().canonicalize(request.getParameter("password2"));
 			if (username == null || username.trim().length() == 0
 				|| password1 == null || password1.trim().length() == 0
 				|| password2 == null || password2.trim().length() == 0)
@@ -87,9 +89,9 @@ public class AdminServlet extends HttpServlet {
 		
 		//change password
 		else if (request.getRequestURL().toString().endsWith("changePassword")){
-			String username = request.getParameter("username");
-			String password1 = request.getParameter("password1");
-			String password2 = request.getParameter("password2");
+			String username = ESAPI.encoder().canonicalize(request.getParameter("username"));
+			String password1 = ESAPI.encoder().canonicalize(request.getParameter("password1"));
+			String password2 = ESAPI.encoder().canonicalize(request.getParameter("password2"));
 			if (username == null || username.trim().length() == 0
 					|| password1 == null || password1.trim().length() == 0
 					|| password2 == null || password2.trim().length() == 0)
@@ -121,3 +123,4 @@ public class AdminServlet extends HttpServlet {
 	}
 
 }
+
