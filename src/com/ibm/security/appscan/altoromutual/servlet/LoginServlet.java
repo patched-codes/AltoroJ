@@ -33,7 +33,6 @@ import com.ibm.security.appscan.altoromutual.util.ServletUtil;
 /**
  * This servlet processes user's login and logout operations
  * Servlet implementation class LoginServlet
- * @author Alexei
  */
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -92,6 +91,8 @@ public class LoginServlet extends HttpServlet {
 		//Handle the cookie using ServletUtil.establishSession(String)
 		try{
 			Cookie accountCookie = ServletUtil.establishSession(username,session);
+			accountCookie.setHttpOnly(true);
+			accountCookie.setSecure(true);
 			response.addCookie(accountCookie);
 			response.sendRedirect(request.getContextPath()+"/bank/main.jsp");
 			}
@@ -105,3 +106,4 @@ public class LoginServlet extends HttpServlet {
 	}
 
 }
+
