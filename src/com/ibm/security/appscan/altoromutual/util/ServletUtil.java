@@ -343,6 +343,7 @@ public class ServletUtil {
 			Account[] accounts = user.getAccounts();
 		    String accountStringList = Account.toBase64List(accounts);
 		    Cookie accountCookie = new Cookie(ServletUtil.ALTORO_COOKIE, accountStringList);
+		    accountCookie.setSecure(true); // Set secure flag to true
 			session.setAttribute(ServletUtil.SESSION_ATTR_USER, user);
 		    return accountCookie;
 		}
@@ -360,7 +361,7 @@ public class ServletUtil {
 			if (user == null)
 				return false;
 		} catch (Exception e) {
-			e.printStackTrace();
+			// Do not print stack trace in production code
 			return false;
 		}
 		
