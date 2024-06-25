@@ -13,6 +13,18 @@ import org.apache.commons.lang.StringEscapeUtils;
 import com.ibm.security.appscan.altoromutual.model.Account;
 import com.ibm.security.appscan.altoromutual.model.User;
 
+import java.nio.charset.Charset;
+import java.security.SecureRandom;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Date;
+import java.util.Random;
+import java.util.StringTokenizer;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 public class OperationsUtil {
 
 	public static String doApiTransfer(HttpServletRequest request, long creditActId, long debitActId,
@@ -145,7 +157,7 @@ public class OperationsUtil {
 	
 	public static String makeRandomString() {
 	    byte[] array = new byte[7]; // length is bounded by 7
-	    new Random().nextBytes(array);
+	    new SecureRandom().nextBytes(array);
 	    String generatedString = new String(array, Charset.forName("UTF-8"));
 	 
 	    return generatedString;
