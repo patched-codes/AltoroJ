@@ -38,6 +38,15 @@ import com.ibm.security.appscan.altoromutual.util.ServletUtil;
 public class TransferServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
+	/**
+	 * Handles HTTP GET requests by delegating to the doPost method.
+	 * This method overrides the default behavior of HttpServlet.
+	 *
+	 * @param req the HttpServletRequest object that contains the request the client made of the servlet
+	 * @param resp the HttpServletResponse object that contains the response the servlet sends to the client
+	 * @throws ServletException if the request for the GET could not be handled
+	 * @throws IOException if an input or output error is detected when the servlet handles the GET request
+	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -48,7 +57,18 @@ public class TransferServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	/**
+	 * Handles HTTP POST requests for a fund transfer operation.
+	 * 
+	 * This method processes a fund transfer between accounts. It first checks if the user is logged in,
+	 * redirecting to the login page if not. It then retrieves the necessary parameters from the request,
+	 * performs the transfer operation, and forwards the result to the transfer.jsp page.
+	 * 
+	 * @param request The HttpServletRequest object containing the client's request
+	 * @param response The HttpServletResponse object for sending the response
+	 * @throws ServletException If the request could not be handled
+	 * @throws IOException If an input or output error occurs while the servlet is handling the HTTP request
+	 */	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		
 		if(!ServletUtil.isLoggedin(request)){
