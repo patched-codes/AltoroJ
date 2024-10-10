@@ -15,6 +15,15 @@ import com.ibm.security.appscan.altoromutual.model.User;
 
 public class OperationsUtil {
 
+	/**
+	* Performs an API transfer of funds between two accounts for an authenticated user.
+	* 
+	* @param request The HttpServletRequest object containing the user's session information
+	* @param creditActId The ID of the account to be credited (receiving funds)
+	* @param debitActId The ID of the account to be debited (sending funds)
+	* @param amount The amount of money to be transferred
+	* @return A String message indicating the result of the transfer operation, including success or error details
+	*/
 	public static String doApiTransfer(HttpServletRequest request, long creditActId, long debitActId,
 			double amount) {
 		
@@ -36,6 +45,15 @@ public class OperationsUtil {
 	}
 	
 	
+	/**
+	* Performs a fund transfer between two accounts for a given user.
+	* 
+	* @param request The HttpServletRequest containing user and session information
+	* @param creditActId The ID of the destination account for the transfer
+	* @param accountIdString The ID or name of the source account for the transfer
+	* @param amount The amount to be transferred
+	* @return A string message indicating the result of the transfer operation
+	*/
 	public static String doServletTransfer(HttpServletRequest request, long creditActId, String accountIdString,
 			double amount) {
 		
@@ -116,6 +134,15 @@ public class OperationsUtil {
 		return message;
 	}
 
+	/**
+	* Sends feedback and optionally stores it in the database.
+	* 
+	* @param name The name of the person providing feedback
+	* @param email The email address of the person providing feedback
+	* @param subject The subject of the feedback
+	* @param comments The actual feedback comments
+	* @return The ID of the stored feedback as a String if storage is enabled, null otherwise
+	*/
 	public static String sendFeedback(String name, String email,
 			String subject, String comments) {
 		
@@ -131,6 +158,13 @@ public class OperationsUtil {
 		return null;
 	}
 	
+	/**
+	* Retrieves a User object based on the access token in the HTTP request.
+	* 
+	* @param request The HttpServletRequest containing the Authorization header with the access token
+	* @return User object corresponding to the authenticated user
+	* @throws SQLException if there's an error retrieving user information from the database
+	*/
 	public static User getUser(HttpServletRequest request) throws SQLException{
 		
 		String accessToken = request.getHeader("Authorization").replaceAll("Bearer ", "");
@@ -143,6 +177,11 @@ public class OperationsUtil {
 		
 	}
 	
+	/**
+	* Generates a random string of 7 bytes encoded in UTF-8.
+	* 
+	* @return A randomly generated string of 7 bytes length, encoded in UTF-8
+	*/
 	public static String makeRandomString() {
 	    byte[] array = new byte[7]; // length is bounded by 7
 	    new Random().nextBytes(array);
