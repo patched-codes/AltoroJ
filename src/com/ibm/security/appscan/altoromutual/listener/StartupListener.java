@@ -23,6 +23,13 @@ public class StartupListener implements ServletContextListener {
 		}
 	}
 
+	/**
+	* Handles the destruction of the servlet context.
+	* This method is called when the servlet context is about to be destroyed.
+	* In this implementation, it does nothing.
+	* 
+	* @param sce The ServletContextEvent containing the ServletContext that is being destroyed
+	*/
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		// do nothing
