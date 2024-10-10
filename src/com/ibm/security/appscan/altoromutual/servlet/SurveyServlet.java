@@ -98,8 +98,18 @@ public class SurveyServlet extends HttpServlet {
 			request.getSession().setAttribute("surveyStep", step);
 		}
 		response.setContentType("text/html");
-		response.getWriter().write(content);
-		response.getWriter().flush();
+		import org.apache.commons.text.StringEscapeUtils;
+		
+		// Get user input
+		String userInput = request.getParameter("userInput");
+		// Encode the input using the Html4 encoder
+		String htmlEncodedContent = StringEscapeUtils.escapeHtml4(userInput);
+		// Force the HTTP response to be content type of text/plain so it is not interpreted as HTML
+		response.setContentType("text/plain");
+		// Ensure UTF-8
+		response.setCharacterEncoding("UTF-8");
+		// Write response
+		response.getWriter().write(htmlEncodedContent);		response.getWriter().flush();
 		
 	}
 }
