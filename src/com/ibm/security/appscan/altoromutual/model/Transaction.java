@@ -41,22 +41,47 @@ public class Transaction {
 		this.date = date;
 	}
 
+	/**
+	* Retrieves the transaction ID.
+	* 
+	* @return The integer value representing the transaction ID.
+	*/
 	public int getTransactionId() {
 		return transactionId;
 	}
 
+	/**
+	* Retrieves the account ID associated with this object.
+	* 
+	* @return The account ID as a long value
+	*/
 	public long getAccountId() {
 		return accountId;
 	}
 
+	/**
+	 * Gets the transaction type.
+	 * 
+	 * @return The transaction type as a String.
+	 */
 	public String getTransactionType() {
 		return transactionType;
 	}
 
+	/**
+	* Retrieves the amount value.
+	* 
+	* @return The current amount value as a double.
+	*/
 	public double getAmount() {
 		return amount;
 	}
 
+	/**
+	* Returns the date associated with this object.
+	* 
+	* @return The Date object representing the date
+	*/
 	public Date getDate() {
 		return date;
 	}
