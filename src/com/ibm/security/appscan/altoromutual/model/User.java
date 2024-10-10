@@ -45,34 +45,74 @@ public class User implements java.io.Serializable{
 		lastAccessDate = new Date();
 	}
 	
-	public void setRole(Role role){
+	/**
+	* Sets the role for this object.
+	* 
+	* @param role The Role object to be set
+	*/	public void setRole(Role role){
 		this.role = role;
 	}
 	
+	/**
+	* Retrieves the role associated with this object.
+	*
+	* @return The Role object representing the current role.
+	*/
 	public Role getRole(){
 		return role;
 	}
 	
+	/**
+	* Retrieves the last access date.
+	*
+	* @return The Date object representing the last access date
+	*/
 	public Date getLastAccessDate() {
 		return lastAccessDate;
 	}
 
+	/**
+	* Sets the last access date for this object.
+	* 
+	* @param lastAccessDate The Date object representing the last access date to be set
+	*/
 	public void setLastAccessDate(Date lastAccessDate) {
 		this.lastAccessDate = lastAccessDate;
 	}
 
+	/**
+	* Retrieves the username associated with this object.
+	* 
+	* @return The username as a String
+	*/
 	public String getUsername() {
 		return username;
 	}
 
+	/**
+	 * Gets the first name of the person.
+	 * 
+	 * @return The first name as a String
+	 */
 	public String getFirstName() {
 		return firstName;
 	}
 
+	/**
+	* Gets the last name of the person.
+	* 
+	* @return The last name as a String
+	*/
 	public String getLastName() {
 		return lastName;
 	}
 	
+	/**
+	* Retrieves an array of Account objects for the current user.
+	* 
+	* @return An array of Account objects associated with the user, or null if an error occurs
+	* @throws SQLException if there's an error accessing the database
+	*/
 	public Account[] getAccounts(){
 		try {
 			return DBUtil.getAccounts(username);
@@ -82,6 +122,12 @@ public class User implements java.io.Serializable{
 		}
 	}
 	
+	/**
+	* Looks up an Account object based on the provided account number.
+	* 
+	* @param accountNumber The unique identifier for the account to be retrieved
+	* @return The Account object if found, or null if no matching account is found
+	*/
 	public Account lookupAccount(Long accountNumber) {
 		for (Account account : getAccounts()) {
 			if (account.getAccountId() == accountNumber)
@@ -90,6 +136,14 @@ public class User implements java.io.Serializable{
 		return null;
 	}
 	
+	/**
+	* Retrieves the credit card number associated with the user's account.
+	* 
+	* This method iterates through all accounts of the user and returns
+	* the account ID of the credit card account if found.
+	* 
+	* @return The account ID of the credit card account, or -1 if not found
+	*/
 	public long getCreditCardNumber(){
 		for (Account account: getAccounts()){
 			if (DBUtil.CREDIT_CARD_ACCOUNT_NAME.equals(account.getAccountName()))
@@ -98,6 +152,15 @@ public class User implements java.io.Serializable{
 		return -1L;
 	}
 	
+	/**
+	* Retrieves user transactions within a specified date range for given accounts.
+	* 
+	* @param startDate The start date of the transaction period (inclusive)
+	* @param endDate The end date of the transaction period (inclusive)
+	* @param accounts An array of Account objects to fetch transactions for
+	* @return An array of Transaction objects matching the specified criteria
+	* @throws SQLException If a database access error occurs
+	*/
 	public Transaction[] getUserTransactions(String startDate, String endDate, Account[] accounts) throws SQLException {
 		
 		Transaction[] transactions = null;
