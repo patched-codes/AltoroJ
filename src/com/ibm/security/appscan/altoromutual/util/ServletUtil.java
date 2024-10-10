@@ -246,6 +246,14 @@ public class ServletUtil {
 		return StringEscapeUtils.escapeHtml(data);
 	}
 
+	/**
+	 * Sanitizes HTML input by checking against a predefined XSS regular expression.
+	 * If the input matches the XSS pattern, it returns an empty string.
+	 * Otherwise, it returns the original input unchanged.
+	 * 
+	 * @param input The HTML string to be sanitized
+	 * @return The sanitized string, or an empty string if XSS is detected
+	 */
 	public static String sanitzieHtmlWithRegex(String input) {
 		if (XSS_REGEXP.matcher(input).matches()) {
 			return "";
@@ -337,6 +345,14 @@ public class ServletUtil {
 		}
 	}
 
+	/**
+	* Establishes a user session and creates a cookie with account information.
+	* 
+	* @param username The username of the user for whom the session is being established
+	* @param session The HttpSession object to store user information
+	* @return A Cookie object containing encoded account information, or null if an error occurs
+	* @throws SQLException If there's an error accessing the database
+	*/
 	public static Cookie establishSession(String username, HttpSession session){
 		try{
 			User user = DBUtil.getUserInfo(username);
@@ -352,6 +368,12 @@ public class ServletUtil {
 		}
 	}
 	
+	/**
+	* Checks if a user is currently logged in based on the session attribute.
+	* 
+	* @param request The HttpServletRequest object containing the session information
+	* @return true if the user is logged in, false otherwise
+	*/
 	static public boolean isLoggedin(HttpServletRequest request){
 		try {
 			// Check user is logged in
@@ -367,7 +389,12 @@ public class ServletUtil {
 		return true;
 	}
 	
-	static public User getUser(HttpServletRequest request){
+	/**
+	* Retrieves the User object from the current session.
+	* 
+	* @param request The HttpServletRequest object containing the session information
+	* @return The User object associated with the current session, or null if not found
+	*/	static public User getUser(HttpServletRequest request){
 		User user = (User)request.getSession().getAttribute(ServletUtil.SESSION_ATTR_USER);
 		return user;
 	}
