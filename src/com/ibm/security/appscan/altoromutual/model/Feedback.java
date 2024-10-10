@@ -24,22 +24,47 @@ public class Feedback {
 		this.message = message;
 	}
 	
+	/**
+	* Gets the feedback ID.
+	* 
+	* @return The feedback ID as a long value.
+	*/
 	public long getFeedbackID() {
 		return feedbackID;
 	}
 
+	/**
+	* Returns the name of the object.
+	* 
+	* @return The name of the object as a String.
+	*/
 	public String getName() {
 		return name;
 	}
 
+	/**
+	* Returns the message stored in this object.
+	*
+	* @return The message as a String
+	*/
 	public String getMessage() {
 		return message;
 	}
 
+	/**
+	* Gets the subject of the email or message.
+	* 
+	* @return The subject string of the email or message
+	*/
 	public String getSubject() {
 		return subject;
 	}
 
+	/**
+	* Retrieves the email address associated with this object.
+	* 
+	* @return The email address as a String
+	*/
 	public String getEmail() {
 		return email;
 	}
