@@ -96,47 +96,54 @@ public class DBUtil {
 		}
 	}
 
-	private static Connection getConnection() throws SQLException{
-
-		if (instance == null)
-			instance = new DBUtil();
-		
-		if (instance.connection == null || instance.connection.isClosed()){
-			
-			//If there is a custom data source configured use it to initialize
-			if (instance.dataSource != null){
-				instance.connection = instance.dataSource.getConnection();	
-				
-				if (ServletUtil.isAppPropertyTrue("database.reinitializeOnStart")){
-					instance.initDB();
-				}
-				return instance.connection;
-			}
-			
-			// otherwise initialize connection to the built-in Derby database
-			try {
-				//attempt to connect to the database
-				instance.connection = DriverManager.getConnection(PROTOCOL+"altoro");
-				
-				if (ServletUtil.isAppPropertyTrue("database.reinitializeOnStart")){
-					instance.initDB();
-				}
-			} catch (SQLException e){
-				//if database does not exist, create it an initialize it
-				if (e.getErrorCode() == 40000){
-					instance.connection = DriverManager.getConnection(PROTOCOL+"altoro;create=true");
-					instance.initDB();
-				//otherwise pass along the exception
-				} else {
-					throw e;
-				}
-			}
-
-		}
-		
-		return instance.connection;	
-	}
+	import java.util.Properties;
 	
+	private static Connection getConnection() throws SQLException{
+	
+	    if (instance == null)
+	        instance = new DBUtil();
+	
+	    if (instance.connection == null || instance.connection.isClosed()){
+	        
+	        //If there is a custom data source configured use it to initialize
+	        if (instance.dataSource != null){
+	            instance.connection = instance.dataSource.getConnection();    
+	            
+	            if (ServletUtil.isAppPropertyTrue("database.reinitializeOnStart")){
+	                instance.initDB();
+	            }
+	            return instance.connection;
+	        }
+	        
+	        // otherwise initialize connection to the built-in Derby database
+	        try {
+	            // Retrieve database password from environment variable or secure storage
+	            String dbPassword = System.getenv("DB_PASSWORD");
+	            Properties properties = new Properties();
+	            properties.setProperty("user", "username");  // Replace with actual username
+	            properties.setProperty("password", dbPassword);
+	            
+	            // attempt to connect to the database
+	            instance.connection = DriverManager.getConnection(PROTOCOL+"altoro", properties);
+	            
+	            if (ServletUtil.isAppPropertyTrue("database.reinitializeOnStart")){
+	                instance.initDB();
+	            }
+	        } catch (SQLException e){
+	            //if database does not exist, create it an initialize it
+	            if (e.getErrorCode() == 40000){
+	                instance.connection = DriverManager.getConnection(PROTOCOL+"altoro;create=true");
+	                instance.initDB();
+	            //otherwise pass along the exception
+	            } else {
+	                throw e;
+	            }
+	        }
+	
+	    }
+	    
+	    return instance.connection;    
+	}	
 	/*
 	 * Create and initialize the database
 	 */
