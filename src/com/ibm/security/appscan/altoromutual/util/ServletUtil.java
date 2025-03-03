@@ -246,6 +246,12 @@ public class ServletUtil {
 		return StringEscapeUtils.escapeHtml(data);
 	}
 
+	/**
+	 * Sanitizes HTML input by checking for potential XSS (Cross-Site Scripting) patterns using a regular expression.
+	 * 
+	 * @param input The HTML string to be sanitized
+	 * @return An empty string if the input matches the XSS pattern, otherwise returns the original input
+	 */
 	public static String sanitzieHtmlWithRegex(String input) {
 		if (XSS_REGEXP.matcher(input).matches()) {
 			return "";
@@ -337,6 +343,14 @@ public class ServletUtil {
 		}
 	}
 
+	/**
+	 * Establishes a session for a given user and creates a cookie with account information.
+	 * 
+	 * @param username The username of the user for whom the session is being established
+	 * @param session The HttpSession object to store user information
+	 * @return A Cookie object containing encoded account information, or null if an error occurs
+	 * @throws SQLException If there's an error retrieving user information from the database
+	 */
 	public static Cookie establishSession(String username, HttpSession session){
 		try{
 			User user = DBUtil.getUserInfo(username);
@@ -352,6 +366,12 @@ public class ServletUtil {
 		}
 	}
 	
+	/**
+	 * Checks if a user is logged in based on the session attribute.
+	 * 
+	 * @param request The HttpServletRequest object containing the session information
+	 * @return true if the user is logged in, false otherwise
+	 */
 	static public boolean isLoggedin(HttpServletRequest request){
 		try {
 			// Check user is logged in
@@ -367,6 +387,12 @@ public class ServletUtil {
 		return true;
 	}
 	
+	/**
+	 * Retrieves the User object associated with the current session from the HttpServletRequest.
+	 * 
+	 * @param request The HttpServletRequest object containing the session information
+	 * @return The User object stored in the session, or null if no user is associated with the session
+	 */
 	static public User getUser(HttpServletRequest request){
 		User user = (User)request.getSession().getAttribute(ServletUtil.SESSION_ATTR_USER);
 		return user;

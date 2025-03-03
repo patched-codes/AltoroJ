@@ -73,6 +73,16 @@ public class User implements java.io.Serializable{
 		return lastName;
 	}
 	
+	/**
+	 * Retrieves an array of Account objects for the current user.
+	 * 
+	 * This method attempts to fetch account information from the database
+	 * using the DBUtil.getAccounts() method. If a SQLException occurs during
+	 * the database operation, it prints the stack trace and returns null.
+	 * 
+	 * @return An array of Account objects if successful, or null if an error occurs
+	 * @throws SQLException if a database access error occurs (caught internally)
+	 */
 	public Account[] getAccounts(){
 		try {
 			return DBUtil.getAccounts(username);
@@ -82,6 +92,12 @@ public class User implements java.io.Serializable{
 		}
 	}
 	
+	/**
+	 * Looks up an Account object based on the provided account number.
+	 * 
+	 * @param accountNumber The unique identifier for the account to be retrieved
+	 * @return The Account object matching the given account number, or null if no match is found
+	 */
 	public Account lookupAccount(Long accountNumber) {
 		for (Account account : getAccounts()) {
 			if (account.getAccountId() == accountNumber)
@@ -90,6 +106,14 @@ public class User implements java.io.Serializable{
 		return null;
 	}
 	
+	/**
+	 * Retrieves the credit card account number for the user.
+	 * 
+	 * This method iterates through the user's accounts and returns the account ID
+	 * of the credit card account if found.
+	 * 
+	 * @return The account ID of the credit card account if found, or -1L if not found.
+	 */
 	public long getCreditCardNumber(){
 		for (Account account: getAccounts()){
 			if (DBUtil.CREDIT_CARD_ACCOUNT_NAME.equals(account.getAccountName()))
@@ -98,6 +122,15 @@ public class User implements java.io.Serializable{
 		return -1L;
 	}
 	
+	/**
+	 * Retrieves user transactions for specified accounts within a given date range.
+	 * 
+	 * @param startDate The start date of the transaction period (inclusive)
+	 * @param endDate The end date of the transaction period (inclusive)
+	 * @param accounts An array of Account objects to retrieve transactions for
+	 * @return An array of Transaction objects matching the specified criteria
+	 * @throws SQLException If a database access error occurs
+	 */
 	public Transaction[] getUserTransactions(String startDate, String endDate, Account[] accounts) throws SQLException {
 		
 		Transaction[] transactions = null;

@@ -96,6 +96,17 @@ public class DBUtil {
 		}
 	}
 
+	/**
+	 * Retrieves a database connection, creating one if necessary.
+	 * 
+	 * This method manages a singleton instance of a database connection. It first checks if
+	 * a connection already exists and is open. If not, it attempts to create a new connection
+	 * using either a custom data source (if configured) or the built-in Derby database.
+	 * If the database does not exist, it creates and initializes it.
+	 * 
+	 * @return Connection A valid database connection
+	 * @throws SQLException If there is an error establishing the database connection
+	 */
 	private static Connection getConnection() throws SQLException{
 
 		if (instance == null)
@@ -421,6 +432,17 @@ public class DBUtil {
 			return transactions.toArray(new Transaction[transactions.size()]); 
 	}
 
+	/**
+	 * Retrieves an array of bank user IDs from the database.
+	 * 
+	 * This method connects to the database, executes a SQL query to select all USER_ID
+	 * values from the PEOPLE table, and returns them as an array of strings.
+	 * 
+	 * @return An array of String containing all user IDs from the database.
+	 *         If an error occurs during database access, an empty array is returned.
+	 * @throws SQLException If a database access error occurs or the SQL query fails.
+	 *         This exception is caught internally and its stack trace is printed.
+	 */
 	public static String[] getBankUsernames() {
 		
 		try {
@@ -444,6 +466,17 @@ public class DBUtil {
 		}
 	}
 	
+	/**
+	 * Retrieves an Account object from the database based on the provided account number.
+	 * 
+	 * This method establishes a database connection, executes a SQL query to fetch account details,
+	 * and constructs an Account object with the retrieved information. If multiple accounts are found,
+	 * only the first one is returned. If no account is found, null is returned.
+	 * 
+	 * @param accountNo The account number to search for in the database
+	 * @return An Account object containing the account details if found, or null if not found
+	 * @throws SQLException If a database access error occurs or this method is called on a closed connection
+	 */
 	public static Account getAccount(long accountNo) throws SQLException {
 
 		Connection connection = getConnection();
@@ -464,6 +497,14 @@ public class DBUtil {
 		return accounts.get(0);
 	}
 
+	/**
+	 * Adds a new account for a given user to the ACCOUNTS database table.
+	 * 
+	 * @param username The user identifier for the account
+	 * @param acctType The type of account to be created
+	 * @return null if the account is successfully added, or an error message if an SQLException occurs
+	 * @throws SQLException if there is an error executing the SQL statement
+	 */
 	public static String addAccount(String username, String acctType) {
 		try {
 			Connection connection = getConnection();
@@ -475,6 +516,16 @@ public class DBUtil {
 		}
 	}
 	
+	/**
+	 * Adds a special user to the SPECIAL_CUSTOMERS database table.
+	 * 
+	 * @param username The username of the special user to be added
+	 * @param password The password for the special user
+	 * @param firstname The first name of the special user
+	 * @param lastname The last name of the special user
+	 * @return null if the user is successfully added, or the SQLException message as a String if an error occurs
+	 * @throws SQLException if there is an error executing the SQL statement
+	 */
 	public static String addSpecialUser(String username, String password, String firstname, String lastname) {
 		try {
 			Connection connection = getConnection();
@@ -487,6 +538,19 @@ public class DBUtil {
 		}
 	}
 	
+	/**
+	 * Adds a new user to the PEOPLE database table.
+	 * 
+	 * This method inserts a new user record into the PEOPLE table with the provided
+	 * information. The user is assigned the default role of 'user'.
+	 * 
+	 * @param username The unique identifier for the user
+	 * @param password The user's password
+	 * @param firstname The user's first name
+	 * @param lastname The user's last name
+	 * @return null if the user is successfully added, or the error message as a String if an SQLException occurs
+	 * @throws SQLException if there is an error executing the SQL statement
+	 */
 	public static String addUser(String username, String password, String firstname, String lastname) {
 		try {
 			Connection connection = getConnection();
@@ -499,6 +563,14 @@ public class DBUtil {
 		}
 	}
 	
+	/**
+	 * Changes the password for a given user in the database.
+	 * 
+	 * @param username The user ID of the account whose password is to be changed
+	 * @param password The new password to set for the user
+	 * @return null if the password change is successful, or an error message as a String if an SQLException occurs
+	 * @throws SQLException if there is an error executing the SQL statement or connecting to the database
+	 */
 	public static String changePassword(String username, String password) {
 		try {
 			Connection connection = getConnection();
@@ -512,6 +584,16 @@ public class DBUtil {
 	}
 
 	
+	/**
+	 * Stores feedback information in the database.
+	 * 
+	 * @param name The name of the person providing feedback
+	 * @param email The email address of the person providing feedback
+	 * @param subject The subject of the feedback
+	 * @param comments The detailed comments or content of the feedback
+	 * @return The generated ID of the stored feedback entry, or -1 if an error occurred
+	 * @throws SQLException If there is an error executing the SQL statement or accessing the database
+	 */
 	public static long storeFeedback(String name, String email, String subject, String comments) {
 		try{ 
 			Connection connection = getConnection();

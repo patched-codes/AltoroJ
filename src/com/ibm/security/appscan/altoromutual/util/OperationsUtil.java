@@ -15,6 +15,22 @@ import com.ibm.security.appscan.altoromutual.model.User;
 
 public class OperationsUtil {
 
+	/**
+	 * Transfers funds between two accounts via an API call.
+	 * 
+	 * This method processes a fund transfer request between two accounts for an authenticated user.
+	 * It retrieves the user from the request, performs the transfer using a database utility,
+	 * and returns a status message indicating the result of the operation.
+	 * 
+	 * @param request The HttpServletRequest containing the user's authentication information
+	 * @param creditActId The ID of the account to be credited (receiving funds)
+	 * @param debitActId The ID of the account to be debited (sending funds)
+	 * @param amount The amount of funds to transfer
+	 * @return A string message indicating the result of the transfer operation
+	 *         If successful, it includes the amount transferred, account IDs, and timestamp
+	 *         If unsuccessful, it returns an error message with details
+	 * @throws SQLException If a database error occurs during the fund transfer process
+	 */
 	public static String doApiTransfer(HttpServletRequest request, long creditActId, long debitActId,
 			double amount) {
 		
@@ -36,6 +52,19 @@ public class OperationsUtil {
 	}
 	
 	
+	/**
+	 * Performs a servlet transfer operation between two bank accounts.
+	 * 
+	 * This method processes a fund transfer request from one account to another.
+	 * It validates the accounts, performs the transfer, and returns a status message.
+	 * The method does not check for available balance before the transfer.
+	 * 
+	 * @param request The HttpServletRequest containing user and session information
+	 * @param creditActId The ID of the destination account to receive the funds
+	 * @param accountIdString The ID or name of the source account to transfer funds from
+	 * @param amount The amount of money to transfer
+	 * @return A string message indicating the result of the transfer operation
+	 */
 	public static String doServletTransfer(HttpServletRequest request, long creditActId, String accountIdString,
 			double amount) {
 		
@@ -116,6 +145,15 @@ public class OperationsUtil {
 		return message;
 	}
 
+	/**
+	 * Sends feedback and optionally stores it in the database.
+	 * 
+	 * @param name The name of the person providing feedback
+	 * @param email The email address of the person providing feedback
+	 * @param subject The subject of the feedback
+	 * @param comments The detailed feedback comments
+	 * @return The ID of the stored feedback as a String if storage is enabled, otherwise null
+	 */
 	public static String sendFeedback(String name, String email,
 			String subject, String comments) {
 		
@@ -131,6 +169,13 @@ public class OperationsUtil {
 		return null;
 	}
 	
+	/**
+	 * Retrieves a User object based on the access token provided in the HTTP request.
+	 * 
+	 * @param request The HttpServletRequest containing the access token in the Authorization header
+	 * @return User object corresponding to the authenticated user
+	 * @throws SQLException If there's an error accessing the database
+	 */
 	public static User getUser(HttpServletRequest request) throws SQLException{
 		
 		String accessToken = request.getHeader("Authorization").replaceAll("Bearer ", "");
@@ -143,6 +188,15 @@ public class OperationsUtil {
 		
 	}
 	
+	/**
+	 * Generates a random string of 7 bytes encoded in UTF-8.
+	 * 
+	 * This method creates a byte array of length 7, fills it with random bytes,
+	 * and then converts it to a UTF-8 encoded string. The resulting string
+	 * may contain non-printable characters.
+	 * 
+	 * @return A randomly generated string of 7 bytes encoded in UTF-8
+	 */
 	public static String makeRandomString() {
 	    byte[] array = new byte[7]; // length is bounded by 7
 	    new Random().nextBytes(array);
