@@ -308,7 +308,7 @@ Lexer.prototype.token = function(src, top, bq) {
         if (~item.indexOf('\n ')) {
           space -= item.length;
           item = !this.options.pedantic
-            ? item.replace(new RegExp('^ {1,' + space + '}', 'gm'), '')
+            ? item.replace(/^ {1,4}/gm, '') // Using a safe fixed maximum
             : item.replace(/^ {1,4}/gm, '');
         }
 
@@ -1099,7 +1099,30 @@ function replace(regex, opt) {
   regex = regex.source;
   opt = opt || '';
   return function self(name, val) {
-    if (!name) return new RegExp(regex, opt);
+    if (!name) {
+      // Add pattern validation for extremely long patterns
+      if (regex.length > 2000) {
+        throw new Error('Regular expression too long');
+      }
+
+      // Critical ReDoS patterns to block
+      if (
+        // (a+)+ pattern - nested quantifiers
+        /\([^()]*[+*]\)[+*]/.test(regex) ||
+        // (a+)\1+ pattern - backreference with quantifier
+        /\([^()]*[+*]\)\\\d+[+*]/.test(regex) ||
+        // ((a+)...)+ pattern - multiple nested groups with quantifiers
+        /\([^()]*\([^()]*[+*][^()]*\)[^()]*\)[+*]/.test(regex)
+      ) {
+        throw new Error('Potentially unsafe regular expression pattern');
+      }
+      
+      try {
+        return new RegExp(regex, opt);
+      } catch (e) {
+        throw new Error('Invalid regular expression: ' + e.message);
+      }
+    }
     val = val.source || val;
     val = val.replace(/(^|[^\[])\^/g, '$1');
     regex = regex.replace(name, val);

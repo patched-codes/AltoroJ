@@ -24,7 +24,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This servlet allows the users to view account and transaction information.
@@ -42,6 +43,30 @@ public class AccountViewServlet extends HttpServlet {
         super();
     }
 
+    private static final Map<String, String> ALLOWED_PATHS = new HashMap<>();
+    static {
+        ALLOWED_PATHS.put("balance", "/bank/balance.jsp");
+        ALLOWED_PATHS.put("transaction", "/bank/transaction.jsp");
+    }
+
+    private boolean isValidAccountId(String accountId) {
+        // Implement validation logic (e.g., alphanumeric check, length limits)
+        return accountId != null && accountId.matches("^[A-Za-z0-9]+$");
+    }
+
+    private boolean isValidDateFormat(String date) {
+        // Implement date format validation
+        if (date == null) return true; // null is acceptable
+        // Add proper date format validation (e.g., yyyy-MM-dd)
+        return date.matches("^\\d{4}-\\d{2}-\\d{2}$");
+    }
+
+    private String sanitizeParameter(String param) {
+        if (param == null) return null;
+        // Implement proper parameter encoding/escaping
+        return param.replaceAll("[^A-Za-z0-9\\-]", "");
+    }
+
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -53,8 +78,21 @@ public class AccountViewServlet extends HttpServlet {
 				response.sendRedirect(request.getContextPath()+"/bank/main.jsp");
 				return;
 			}
-//			response.sendRedirect("/bank/balance.jsp&acctId=" + accountName);
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/bank/balance.jsp?acctId=" + accountName);
+			
+			// Validate accountName parameter
+			if (!isValidAccountId(accountName)) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid account ID");
+				return;
+			}
+			
+			String sanitizedAccountName = sanitizeParameter(accountName);
+			String dispatchPath = ALLOWED_PATHS.get("balance");
+			if (dispatchPath == null) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher(dispatchPath + "?acctId=" + sanitizedAccountName);
 			dispatcher.forward(request, response);
 			return;
 		}
@@ -74,7 +112,25 @@ public class AccountViewServlet extends HttpServlet {
 			String startTime = request.getParameter("startDate");
 			String endTime = request.getParameter("endDate");
 			
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/bank/transaction.jsp?" + ((startTime!=null)?"&startTime="+startTime:"") + ((endTime!=null)?"&endTime="+endTime:""));
+			// Validate date parameters
+			if (!isValidDateFormat(startTime) || !isValidDateFormat(endTime)) {
+				response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid date format");
+				return;
+			}
+			
+			String sanitizedStartTime = sanitizeParameter(startTime);
+			String sanitizedEndTime = sanitizeParameter(endTime);
+			String dispatchPath = ALLOWED_PATHS.get("transaction");
+			if (dispatchPath == null) {
+				response.sendError(HttpServletResponse.SC_NOT_FOUND);
+				return;
+			}
+			
+			StringBuilder queryString = new StringBuilder("?");
+			if (sanitizedStartTime != null) queryString.append("&startTime=").append(sanitizedStartTime);
+			if (sanitizedEndTime != null) queryString.append("&endTime=").append(sanitizedEndTime);
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher(dispatchPath + queryString.toString());
 			dispatcher.forward(request, response);
 		}
 	}
