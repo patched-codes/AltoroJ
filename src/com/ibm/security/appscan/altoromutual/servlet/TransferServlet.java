@@ -48,6 +48,19 @@ public class TransferServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	
+	/**
+	 * Processes a POST request for transferring funds between accounts.
+	 * 
+	 * This method handles the server-side logic for a fund transfer operation.
+	 * It first checks if the user is logged in, redirecting to the login page if not.
+	 * Then it extracts transfer details from the request parameters, performs the transfer,
+	 * and forwards the result to the transfer.jsp page.
+	 * 
+	 * @param request The HttpServletRequest object containing the client's request data
+	 * @param response The HttpServletResponse object for sending the response to the client
+	 * @throws ServletException If the request cannot be handled
+	 * @throws IOException If an input or output error occurs while the servlet is handling the HTTP request
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		
