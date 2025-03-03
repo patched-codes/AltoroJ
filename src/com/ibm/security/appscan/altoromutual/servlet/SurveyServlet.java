@@ -19,11 +19,13 @@ IBM AltoroJ
 package com.ibm.security.appscan.altoromutual.servlet;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * Servlet implementation class SurveyServlet
@@ -48,8 +50,15 @@ public class SurveyServlet extends HttpServlet {
 		String content = null;
 		String previousStep = null;
 
-		if (step == null)
+		// Input validation - only allow valid steps
+		if (step == null || !Arrays.asList("a", "b", "c", "").contains(step)) {
 			step = "";
+		}
+		
+		// Set secure headers
+		response.setContentType("text/html");
+		response.setCharacterEncoding("UTF-8");
+		response.setHeader("Content-Security-Policy", "default-src 'self'");
 		
 		if (step.equals("a")){
 			content = "<h1>Question 1</h1>"+
@@ -77,8 +86,11 @@ public class SurveyServlet extends HttpServlet {
 			previousStep="d";
 		}
 		else if (step.equals("done")){
+			// Get and encode the email parameter separately since it's user input
+			String email = request.getParameter("txtEmail");
+			String encodedEmail = StringEscapeUtils.escapeHtml4(email != null ? email : "");
 			content = "<h1>Thanks</h1>"+
-			"<div width=\"99%\"><p>Thanks for your entry.  We will contact you shortly at:<br /><br /> <b>" + request.getParameter("txtEmail") + "</b></p></div>";
+			"<div width=\"99%\"><p>Thanks for your entry.  We will contact you shortly at:<br /><br /> <b>" + encodedEmail + "</b></p></div>";
 			previousStep="email";
 		}
 		else {
@@ -97,8 +109,11 @@ public class SurveyServlet extends HttpServlet {
 		} else {		
 			request.getSession().setAttribute("surveyStep", step);
 		}
-		response.setContentType("text/html");
-		response.getWriter().write(content);
+		// HTML encode all content before writing to response
+		// This provides defense in depth even though we validate the step parameter
+		// and use only static content, except for the email parameter which needs encoding
+		String encodedContent = StringEscapeUtils.escapeHtml4(content);
+		response.getWriter().write(encodedContent);
 		response.getWriter().flush();
 		
 	}
