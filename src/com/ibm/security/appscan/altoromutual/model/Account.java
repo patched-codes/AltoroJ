@@ -102,6 +102,17 @@ public class Account {
 		return (accountList.toArray(new Account[accountList.size()]));
 	}
 	
+	/**
+	 * Converts an array of Account objects to a Base64 encoded string representation.
+	 * 
+	 * This method takes an array of Account objects and creates a string representation
+	 * where each account's details (accountId, accountName, and balance) are concatenated
+	 * with '~' as a separator between fields and '|' as a separator between accounts.
+	 * The resulting string is then Base64 encoded.
+	 * 
+	 * @param accounts An array of Account objects to be converted
+	 * @return A Base64 encoded string representing the list of accounts
+	 */
 	public static String toBase64List(Account[] accounts){
 	
 		StringBuffer accountList = new StringBuffer();
