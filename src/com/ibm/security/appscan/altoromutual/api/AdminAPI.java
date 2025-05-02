@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.security.MessageDigest;
 
 import org.apache.wink.json4j.*;
 
@@ -46,8 +47,8 @@ public class AdminAPI extends AltoroAPI{
 				|| password2 == null || password2.trim().length() == 0)
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"An error has occurred. Please try again later.\"}").build();
 		
-		if (!password1.equals(password2)){
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Entered passwords did not match.\"}").build();
+		if (!MessageDigest.isEqual(password1.getBytes(), password2.getBytes())){
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{\"error\":\"Entered passwords did not match.\"}").build();;
 		}
 	
 		String error = null;
@@ -93,7 +94,7 @@ public class AdminAPI extends AltoroAPI{
 			|| password2 == null || password2.trim().length() == 0)
 			return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\":\"An error has occurred. Please try again later.\"}").build();
 		
-		if (!password1.equals(password2)){
+		if (!MessageDigest.isEqual(password1.getBytes(), password2.getBytes())){
 			return Response.status(Response.Status.BAD_REQUEST).entity("{\"error\":\"Entered passwords did not match.\"}").build();
 		}
 		
